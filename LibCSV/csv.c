@@ -340,7 +340,10 @@ csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, s
 	if (!p->entry_buf && pos < len) {
 		/* Buffer hasn't been allocated yet and len > 0 */
 		if (csv_increase_buffer(p) != 0) {
-			p->quoted = quoted, p->pstate = pstate, p->spaces = spaces, p->entry_pos = entry_pos;
+			p->quoted = quoted;
+			p->pstate = pstate;
+			p->spaces = spaces;
+			p->entry_pos = entry_pos;
 			return pos;
 		}
 	}
@@ -349,7 +352,10 @@ csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, s
 		/* Check memory usage, increase buffer if necessary */
 		if (entry_pos == ((p->options & CSV_APPEND_NULL) ? p->entry_size - 1 : p->entry_size) ) {
 			if (csv_increase_buffer(p) != 0) {
-				p->quoted = quoted, p->pstate = pstate, p->spaces = spaces, p->entry_pos = entry_pos;
+				p->quoted = quoted;
+				p->pstate = pstate;
+				p->spaces = spaces;
+				p->entry_pos = entry_pos;
 				return pos;
 			}
 		}
@@ -393,7 +399,10 @@ csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, s
 						/* STRICT ERROR - double quote inside non-quoted field */
 						if (p->options & CSV_STRICT) {
 							p->status = CSV_EPARSE;
-							p->quoted = quoted, p->pstate = pstate, p->spaces = spaces, p->entry_pos = entry_pos;
+							p->quoted = quoted;
+							p->pstate = pstate;
+							p->spaces = spaces;
+							p->entry_pos = entry_pos;
 							return pos-1;
 						}
 						SUBMIT_CHAR(p, c);
@@ -437,7 +446,10 @@ csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, s
 						/* STRICT ERROR - unescaped double quote */
 						if (p->options & CSV_STRICT) {
 							p->status = CSV_EPARSE;
-							p->quoted = quoted, p->pstate = pstate, p->spaces = spaces, p->entry_pos = entry_pos;
+							p->quoted = quoted;
+							p->pstate = pstate;
+							p->spaces = spaces;
+							p->entry_pos = entry_pos;
 							return pos-1;
 						}
 						spaces = 0;
@@ -450,7 +462,10 @@ csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, s
 					/* STRICT ERROR - unescaped double quote */
 					if (p->options & CSV_STRICT) {
 						p->status = CSV_EPARSE;
-						p->quoted = quoted, p->pstate = pstate, p->spaces = spaces, p->entry_pos = entry_pos;
+						p->quoted = quoted;
+						p->pstate = pstate;
+						p->spaces = spaces;
+						p->entry_pos = entry_pos;
 						return pos-1;
 					}
 					pstate = FIELD_BEGUN;
@@ -462,7 +477,10 @@ csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, s
 				break;
 		}
 	}
-	p->quoted = quoted, p->pstate = pstate, p->spaces = spaces, p->entry_pos = entry_pos;
+	p->quoted = quoted;
+	p->pstate = pstate;
+	p->spaces = spaces;
+	p->entry_pos = entry_pos;
 	return pos;
 }
 
