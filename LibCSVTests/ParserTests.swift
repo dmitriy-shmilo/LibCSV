@@ -38,10 +38,10 @@ class ParserTests: XCTestCase {
 extension ParserTests {
 	static var allTests : [(String, (ParserTests) -> () throws -> Void)] {
 		return [
-				   ("test_defaults", test_defaults),
-				   ("test_semicolon_delimiter", test_semicolon_delimiter),
-				   ("test_tab_delimiter", test_tab_delimiter),
-				   ("test_quoted", test_quoted),
+			("test_defaults", test_defaults),
+			("test_semicolon_delimiter", test_semicolon_delimiter),
+			("test_tab_delimiter", test_tab_delimiter),
+			("test_quoted", test_quoted),
 		]
 	}
 }
