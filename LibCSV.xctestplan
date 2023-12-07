@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "29E5EE77-E321-42AD-941C-918AE77B6246",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:LibCSV.xcodeproj",
+        "identifier" : "2C7487462B21CEB4001D134B",
+        "name" : "LibCSVTests"
+      }
+    }
+  ],
+  "version" : 1
+}
