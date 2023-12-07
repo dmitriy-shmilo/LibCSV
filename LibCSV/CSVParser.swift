@@ -4,10 +4,9 @@ import Foundation
 
 public class CSVParser {
 	private var currentRow = [String]()
-	private var parser: csv_parser
+	private var parser = csv_parser()
 
 	public init() {
-		parser = csv_parser()
 		precondition(csv_init(&parser, UInt8(CSV_APPEND_NULL)) == 0)
 	}
 
@@ -31,8 +30,7 @@ public class CSVParser {
 		}
 	}
 
-	public var didReadField: ((String) -> ())?
-	public var didReadRow: ((Character?) -> ())?
+	public weak var delegate: CSVParserDelegate?
 
 	public func parse(data: Data) throws {
 		let context = Unmanaged.passUnretained(self).toOpaque()
@@ -41,31 +39,43 @@ public class CSVParser {
 				throw CSVError(error: csv_error(&parser))
 			}
 			csv_fini(&parser, cb1, cb2, context)
+			delegate?.csvParserDidFinish(self)
 		}
 	}
 }
 
 private func cb1(bytes: UnsafeMutableRawPointer?, length: Int, context: UnsafeMutableRawPointer?) {
-	guard let context = context else { abort() }
-	let parser = Unmanaged<CSVParser>.fromOpaque(context).takeUnretainedValue()
-	guard let didReadField = parser.didReadField else { return }
+	guard let context = context else {
+		fatalError("CSVParser, missing context in the field read callback.")
+	}
 
-	guard let bytes = bytes?.bindMemory(to: CChar.self, capacity: length) else { abort() }
+	let parser = Unmanaged<CSVParser>.fromOpaque(context).takeUnretainedValue()
+	guard let delegate = parser.delegate else {
+		return
+	}
+
+	guard let bytes = bytes?.bindMemory(to: CChar.self, capacity: length) else {
+		fatalError("CSVParser, failed to bind parsed field memory.")
+	}
 	let string = String(cString: bytes)
-	didReadField(string)
+	delegate.csvParser(parser, didReadField: string)
 }
 
 
 private func cb2(char: Int32, context: UnsafeMutableRawPointer?) -> Void {
-	guard let context = context else { abort() }
+	guard let context = context else {
+		fatalError("CSVParser, missing context in the row read callback.")
+	}
+	
 	let parser = Unmanaged<CSVParser>.fromOpaque(context).takeUnretainedValue()
-	guard let didReadRow = parser.didReadRow else { return }
-
-	let character: Character?
-	switch char {
-	case -1: character = nil
-	default: character = Character(UnicodeScalar(Int(char))!)
+	guard let delegate = parser.delegate else {
+		return
 	}
 
-	didReadRow(character)
+	guard char != -1, let scalar = UnicodeScalar(Int(char)) else {
+		delegate.csvParser(parser, didReadRowTerminatedBy: nil)
+		return
+	}
+
+	delegate.csvParser(parser, didReadRowTerminatedBy: Character(scalar))
 }

@@ -47,11 +47,28 @@ extension ParserTests {
 }
 
 
-func collect(parser: CSVParser, data: Data) throws -> [[String]] {
+class CollectorDelegate: CSVParserDelegate {
 	var rows = [[String]]()
 	var row = [String]()
-	parser.didReadField = { row.append($0) }
-	parser.didReadRow = { _ in rows.append(row); row = [] }
+
+	func csvParser(_ parser: LibCSV.CSVParser, didReadField field: String) {
+		row.append(field)
+	}
+
+	func csvParser(_ parser: LibCSV.CSVParser, didReadRowTerminatedBy character: Character?) {
+		rows.append(row)
+		row = []
+	}
+
+	func csvParserDidFinish(_ parser: LibCSV.CSVParser) {
+	}
+}
+
+func collect(parser: CSVParser, data: Data) throws -> [[String]] {
+	let collector = CollectorDelegate()
+	var rows = [[String]]()
+	var row = [String]()
+	parser.delegate = collector
 	try parser.parse(data: data)
-	return rows
+	return collector.rows
 }

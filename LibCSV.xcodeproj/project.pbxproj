@@ -14,6 +14,7 @@
 		2C7487322B21069A001D134B /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7487312B21069A001D134B /* CSVError.swift */; };
 		2C74874A2B21CEB4001D134B /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7487492B21CEB4001D134B /* ParserTests.swift */; };
 		2C74874B2B21CEB4001D134B /* LibCSV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C74871E2B2103E5001D134B /* LibCSV.framework */; platformFilter = ios; };
+		2C7487662B21DE28001D134B /* CSVParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7487652B21DE28001D134B /* CSVParserDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		2C7487472B21CEB4001D134B /* LibCSVTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibCSVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C7487492B21CEB4001D134B /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		2C7487512B21CFA6001D134B /* LibCSV.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = LibCSV.xctestplan; sourceTree = "<group>"; };
+		2C7487652B21DE28001D134B /* CSVParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParserDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,8 +62,8 @@
 		2C7487142B2103E5001D134B = {
 			isa = PBXGroup;
 			children = (
-				2C7487512B21CFA6001D134B /* LibCSV.xctestplan */,
 				2C7487202B2103E5001D134B /* LibCSV */,
+				2C7487512B21CFA6001D134B /* LibCSV.xctestplan */,
 				2C7487482B21CEB4001D134B /* LibCSVTests */,
 				2C74871F2B2103E5001D134B /* Products */,
 			);
@@ -79,11 +81,12 @@
 		2C7487202B2103E5001D134B /* LibCSV */ = {
 			isa = PBXGroup;
 			children = (
-				2C7487212B2103E5001D134B /* LibCSV.h */,
-				2C7487282B210428001D134B /* csv.h */,
 				2C7487292B210428001D134B /* csv.c */,
-				2C74872E2B210507001D134B /* CSVParser.swift */,
+				2C7487282B210428001D134B /* csv.h */,
 				2C7487312B21069A001D134B /* CSVError.swift */,
+				2C74872E2B210507001D134B /* CSVParser.swift */,
+				2C7487652B21DE28001D134B /* CSVParserDelegate.swift */,
+				2C7487212B2103E5001D134B /* LibCSV.h */,
 			);
 			path = LibCSV;
 			sourceTree = "<group>";
@@ -209,6 +212,7 @@
 			files = (
 				2C74872F2B210507001D134B /* CSVParser.swift in Sources */,
 				2C7487322B21069A001D134B /* CSVError.swift in Sources */,
+				2C7487662B21DE28001D134B /* CSVParserDelegate.swift in Sources */,
 				2C74872B2B210428001D134B /* csv.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
