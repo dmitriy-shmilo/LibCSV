@@ -2,7 +2,7 @@
 
 import Foundation
 
-public class CSVParser {
+public class CSVReader {
 	private var currentRow = [String]()
 	private var parser = csv_parser()
 
@@ -30,7 +30,7 @@ public class CSVParser {
 		}
 	}
 
-	public weak var delegate: CSVParserDelegate?
+	public weak var delegate: CSVReaderDelegate?
 
 	public func parse(data: Data) throws {
 		let context = Unmanaged.passUnretained(self).toOpaque()
@@ -39,7 +39,7 @@ public class CSVParser {
 				throw CSVError(error: csv_error(&parser))
 			}
 			csv_fini(&parser, cb1, cb2, context)
-			delegate?.csvParserDidFinish(self)
+			delegate?.csvReaderDidFinish(self)
 		}
 	}
 }
@@ -49,8 +49,8 @@ private func cb1(bytes: UnsafeMutableRawPointer?, length: Int, context: UnsafeMu
 		fatalError("CSVParser, missing context in the field read callback.")
 	}
 
-	let parser = Unmanaged<CSVParser>.fromOpaque(context).takeUnretainedValue()
-	guard let delegate = parser.delegate else {
+	let reader = Unmanaged<CSVReader>.fromOpaque(context).takeUnretainedValue()
+	guard let delegate = reader.delegate else {
 		return
 	}
 
@@ -58,7 +58,7 @@ private func cb1(bytes: UnsafeMutableRawPointer?, length: Int, context: UnsafeMu
 		fatalError("CSVParser, failed to bind parsed field memory.")
 	}
 	let string = String(cString: bytes)
-	delegate.csvParser(parser, didReadField: string)
+	delegate.csvReader(reader, didReadField: string)
 }
 
 
@@ -67,15 +67,15 @@ private func cb2(char: Int32, context: UnsafeMutableRawPointer?) -> Void {
 		fatalError("CSVParser, missing context in the row read callback.")
 	}
 	
-	let parser = Unmanaged<CSVParser>.fromOpaque(context).takeUnretainedValue()
-	guard let delegate = parser.delegate else {
+	let reader = Unmanaged<CSVReader>.fromOpaque(context).takeUnretainedValue()
+	guard let delegate = reader.delegate else {
 		return
 	}
 
 	guard char != -1, let scalar = UnicodeScalar(Int(char)) else {
-		delegate.csvParser(parser, didReadRowTerminatedBy: nil)
+		delegate.csvReader(reader, didReadRowTerminatedBy: nil)
 		return
 	}
 
-	delegate.csvParser(parser, didReadRowTerminatedBy: Character(scalar))
+	delegate.csvReader(reader, didReadRowTerminatedBy: Character(scalar))
 }
