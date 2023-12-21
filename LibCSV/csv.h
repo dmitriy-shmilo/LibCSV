@@ -83,6 +83,7 @@ void csv_free(struct csv_parser *p);
 int csv_error(const struct csv_parser *p);
 const char * csv_strerror(int error);
 size_t csv_parse(struct csv_parser *p, const void *s, size_t len, void (*cb1)(void *, size_t, void *), void (*cb2)(int, void *), void *data);
+size_t csv_fparse(struct csv_parser *p, FILE *f, void * buf, size_t buf_len, void (*cb1)(void *, size_t, void *), void (*cb2)(int c, void *), void *data);
 size_t csv_write(void *dest, size_t dest_size, const void *src, size_t src_size);
 int csv_fwrite(FILE *fp, const void *src, size_t src_size);
 size_t csv_write2(void *dest, size_t dest_size, const void *src, size_t src_size, unsigned char quote);

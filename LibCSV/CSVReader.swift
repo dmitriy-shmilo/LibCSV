@@ -3,6 +3,7 @@
 import Foundation
 
 public class CSVReader {
+	private static let bufferSize = 4096;
 	private var currentRow = [String]()
 	private var parser = csv_parser()
 
@@ -41,6 +42,39 @@ public class CSVReader {
 			csv_fini(&parser, cb1, cb2, context)
 			delegate?.csvReaderDidFinish(self)
 		}
+	}
+
+	public func parse(url: URL) throws {
+		guard url.isFileURL else {
+			throw CSVError.openFailed(code: 0)
+		}
+
+		var fileHandle: UnsafeMutablePointer<FILE>?
+		if #available(iOS 16.0, *) {
+			fileHandle = fopen(url.path(percentEncoded: false), "rb")
+		} else {
+			fileHandle = fopen(url.path, "rb")
+		}
+
+		guard fileHandle != nil else {
+			throw CSVError.openFailed(code: errno)
+		}
+
+		let context = Unmanaged.passUnretained(self).toOpaque()
+		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Self.bufferSize)
+		defer { buffer.deallocate() }
+
+		var parser = csv_parser()
+		precondition(csv_init(&parser, UInt8(CSV_APPEND_NULL)) == 0)
+		csv_fparse(&parser, fileHandle, buffer, Self.bufferSize, cb1, cb2, context)
+		csv_fini(&parser, cb1, cb2, context)
+
+		guard parser.status == 0 else {
+			throw CSVError(error: csv_error(&parser))
+		}
+
+		fclose(fileHandle)
+		delegate?.csvReaderDidFinish(self)
 	}
 }
 
