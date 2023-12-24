@@ -12,6 +12,7 @@ A [libcsv](https://github.com/rgamble/libcsv/) swift wrapper. Based on [CSV](htt
 ### CSV (Swift) ###
 - Replaced stored callbacks with a delegate.
 - Replaced `abort()`s with messaged `fatalError()`s.
+- Removed forced unwraps.
 - Added a reading finish callback.
 - Added parsing from a file URL directly.
 - Added CSV writing through `CSVWriter`.

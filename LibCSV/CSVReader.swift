@@ -4,36 +4,30 @@ import Foundation
 
 public class CSVReader {
 	private static let bufferSize = 4096;
-	private var currentRow = [String]()
-	private var parser = csv_parser()
 
 	public init() {
-		precondition(csv_init(&parser, UInt8(CSV_APPEND_NULL)) == 0)
 	}
-
-	deinit { csv_free(&parser) }
-
-	public var delimiter: Character {
-		get {
-			return Character(UnicodeScalar(csv_get_delim(&parser)))
-		}
-		set {
-			csv_set_delim(&parser, String(newValue).utf8.first!)
-		}
-	}
-
-	public var quote: Character {
-		get {
-			return Character(UnicodeScalar(csv_get_quote(&parser)))
-		}
-		set {
-			csv_set_quote(&parser, String(newValue).utf8.first!)
-		}
-	}
+	
+	public var delimiter: Character = ","
+	public var quote: Character = "\""
 
 	public weak var delegate: CSVReaderDelegate?
 
 	public func parse(data: Data) throws {
+		guard let delimeter = String(delimiter).utf8.first,
+			  let quote = String(quote).utf8.first else {
+			throw CSVError.notAscii
+		}
+
+		var parser = csv_parser()
+		defer {
+			csv_free(&parser)
+		}
+		
+		csv_init(&parser, UInt8(CSV_APPEND_NULL))
+		csv_set_delim(&parser, delimeter)
+		csv_set_quote(&parser, quote)
+
 		let context = Unmanaged.passUnretained(self).toOpaque()
 		try data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> () in
 			guard csv_parse(&parser, bytes.baseAddress, data.count, cb1, cb2, context) == data.count else {
@@ -45,6 +39,11 @@ public class CSVReader {
 	}
 
 	public func parse(url: URL) throws {
+		guard let delimeter = String(delimiter).utf8.first,
+			  let quote = String(quote).utf8.first else {
+			throw CSVError.notAscii
+		}
+
 		guard url.isFileURL else {
 			throw CSVError.openFailed(code: 0)
 		}
@@ -62,10 +61,17 @@ public class CSVReader {
 
 		let context = Unmanaged.passUnretained(self).toOpaque()
 		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Self.bufferSize)
-		defer { buffer.deallocate() }
-
 		var parser = csv_parser()
-		precondition(csv_init(&parser, UInt8(CSV_APPEND_NULL)) == 0)
+		defer {
+			buffer.deallocate()
+			csv_free(&parser)
+			fclose(fileHandle)
+		}
+
+		csv_init(&parser, UInt8(CSV_APPEND_NULL))
+		csv_set_delim(&parser, delimeter)
+		csv_set_quote(&parser, quote)
+
 		csv_fparse(&parser, fileHandle, buffer, Self.bufferSize, cb1, cb2, context)
 		csv_fini(&parser, cb1, cb2, context)
 
@@ -73,9 +79,9 @@ public class CSVReader {
 			throw CSVError(error: csv_error(&parser))
 		}
 
-		fclose(fileHandle)
 		delegate?.csvReaderDidFinish(self)
 	}
+
 }
 
 private func cb1(bytes: UnsafeMutableRawPointer?, length: Int, context: UnsafeMutableRawPointer?) {
