@@ -18,6 +18,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #if __STDC_VERSION__ >= 199901L
 #  include <stdint.h>
@@ -349,6 +350,7 @@ csv_fparse(struct csv_parser *p, FILE *f, void * buf, size_t buf_len,
 	}
 
 	do {
+		memset(us, 0, buf_len);
 		len = fread(us, sizeof(unsigned char), buf_len, f);
 		buf_pos = 0;
 
